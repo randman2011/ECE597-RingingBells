@@ -21,9 +21,9 @@ function RingBell(chipAddress, regAddress, minDeg, maxDeg, numRings, delay)
 	var x = 0;
 	for (x=0;x<numRings/2;x++)
 	{
-		sendI2C(chipAddress, regAddress, minDeg);
+		SendI2C(chipAddress, regAddress, minDeg);
 		Sleep(delay);
-		sendI2C(chipAddress, regAddress, maxDeg);
+		SendI2C(chipAddress, regAddress, maxDeg);
 		Sleep(delay);
 	}
 }
