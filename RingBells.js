@@ -5,7 +5,7 @@ var s = require("child_process");
 var frequency = 121 // 50 Hz
 var iterations = 0;
 InitializeI2C();
-var pid = setInterval(run, 50);
+var pid = setInterval(run, 500);
 
 
 function run()
@@ -42,6 +42,8 @@ function SendI2C(chipAddress, regAddress, data)
 
 function InitializeI2C()
 {
+	//setup i2c
+	s.exec("BB-I2C1 > /sys/devices/bone_capemgr.9/slots");
 	//set mode to sleep
 	s.exec("i2cset -y 2 0x40 0x00 0x11");
 	s.exec("i2cset -y 2 0x41 0x00 0x11");
