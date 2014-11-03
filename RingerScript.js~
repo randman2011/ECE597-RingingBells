@@ -15,9 +15,8 @@ for (x = 0; x < numWorkers; x++)
 }
 
 //chipAddress, regAddress, minDeg, maxDeg, duration, delay, workerNum
-var iterations = 32;
 var pid = setInterval(run, 500);
-
+var iterations = 32;
 function run()
 {
 	if (iterations >= 32) clearInterval(pid);

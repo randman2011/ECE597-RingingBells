@@ -4,18 +4,14 @@ var s = require("child_process");
 // RingBell({0 or 1}, {0-15}, {0-180} degrees, {0-180} degrees, even numbers, milliseconds)
 onmessage = function RingBell(e)
 {
-//chipAddress, regAddress, minDeg, maxDeg, duration, delay
 	var x = 0;
-	var d = new Date();
-	var endTime = d.getTime() + duration;
-	while (d.getTime() < endTime);
+	for (x=0;x<e.data[4]/2;x++)
 	{
 		SendI2C(e.data[0], e.data[1], e.data[2]);
 		Sleep(e.data[5]);
 		SendI2C(e.data[0], e.data[1], e.data[3]);
 		Sleep(e.data[0]);
 	}
-	postMessage(e.data[6];
 }
 	
 // SendI2C({0 or 1}, {0-15}, {0-180} degrees)
