@@ -31,7 +31,7 @@ function RingBell(chipAddress, regAddress, minDeg, maxDeg, numRings, delay)
 // SendI2C({0 or 1}, {0-15}, {0-180} degrees)
 function SendI2C(chipAddress, regAddress, data)
 {
-	var raw = data * 386 / 180 + 175;
+	var raw = Math.floor(data * 386 / 180 + 175);
 	var rawH = Math.floor(raw / 256);
 	var rawL = raw % 256;
 	s.exec("i2cset -y 2 " + (0x40 + chipAddress) + " " + (6 + 4*regAddress) + " 0x00");
@@ -43,7 +43,7 @@ function SendI2C(chipAddress, regAddress, data)
 function InitializeI2C()
 {
 	//setup i2c
-	s.exec("BB-I2C1 > /sys/devices/bone_capemgr.9/slots");
+	s.exec("echo BB-I2C1 > /sys/devices/bone_capemgr.9/slots");
 	//set mode to sleep
 	s.exec("i2cset -y 2 0x40 0x00 0x11");
 	s.exec("i2cset -y 2 0x41 0x00 0x11");
