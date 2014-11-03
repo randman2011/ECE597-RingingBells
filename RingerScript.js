@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 var s = require("child_process");
+var Worker = new require("webworker-threads");
 var frequency = 121 // 50 Hz
 
 var numWorkers = 3;
