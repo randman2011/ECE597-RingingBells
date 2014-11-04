@@ -17,45 +17,52 @@ if (cluster.isMaster)
 	}
 
 	x = 0;
-	var repetitions = 10;
+	var repetitions = 5;
 	var index = 0;
 	for (index = 0; index < repetitions; index++)
 	{
 		for (var id in cluster.workers) {
-  	  if (x==nextWorker)
+  	        if (x==nextWorker)
 			{
-				cluster.workers[id].send('message', {nextWorker, 60, 120, 6, 50});
-				(nextWorker++)%numWorkers;
-				//Sleep(50);
+				cluster.workers[id].send(index+ " 60 120 3000 50");
+				Sleep(250);
 			}
-  	}
+			x++;
+      	}
+      	(nextWorker++)%numWorkers;
+      	x = nextWorker;
 	}
+	//for (var id in cluster.workers) {
+	//    cluster.workers[id].kill();
+	//}
 }
 else
 {
 	//chipAddress, regAddress, minDeg, maxDeg, duration, delay, workerNum
 	var iterations = 32;
 	var live = 1;
-	while (live)
-	{
-		process.on('message', function(motor, minDeg, maxDeg, numRings, delay)
+//	while (live)
+//	{
+		process.on('message', function(e)
 		{
+		    
+		    var params = e.split(" ");
 			var x = 0;
 			var d = new Date();
-			var endTime = d.getTime() + duration;
-			while (d.getTime() < endTime);
+			var endTime = parseInt(d.getTime()) + parseInt(params[3]);
+			//console.log(e + " " + d.getTime() +" " + params[3] + " " + endTime);
+			while (d.getTime() < endTime)
+			//for (x = 0; x < 10; x ++)
 			{
-				SendI2C(Math.floor(motor/16), motor%16, minDeg);
-				Sleep(delay);
-				SendI2C(Math.floor(motor/16), motor%16, maxDeg);
-				Sleep(delay);
+			    console.log(d.getTime() + " " + endTime + " " + (d.getTime() < endTime));
+				SendI2C(Math.floor(params[0]/16), params[0]%16, params[1]);
+				Sleep(params[4]);
+				SendI2C(Math.floor(params[0]/16), params[0]%16, params[2]);
+				Sleep(params[4]);
+				d = new Date();
 			}
-		}		
-		process.on('kill', function(e)
-		{
-			live = 0;
-		}	
-	}
+		});
+//  }
 }
 
 function run()
@@ -109,4 +116,13 @@ function InitializeI2C()
 onmessage = function(e)
 {
 	workerBusy[e.data] = 0;
+}
+
+function Sleep(milliseconds) {
+  var start = new Date().getTime();
+  for (var i = 0; i < 1e7; i++) {
+    if ((new Date().getTime() - start) > milliseconds){
+      break;
+    }
+  }
 }
