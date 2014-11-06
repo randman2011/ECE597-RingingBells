@@ -16,21 +16,25 @@ if (cluster.isMaster)
 		cluster.fork();
 	}
 
-	x = 0;
-	var repetitions = 5;
+	var repetitions = 16;
 	var index = 0;
 	for (index = 0; index < repetitions; index++)
 	{
-		for (var id in cluster.workers) {
-  	        if (x==nextWorker)
+		
+		x = 0;
+		for (var id in cluster.workers) 
+		{
+  	  if (x==nextWorker)
 			{
-				cluster.workers[id].send(index+ " 60 120 3000 50");
-				Sleep(250);
+				
+				cluster.workers[id].send(index + " 60 120 1000 30");
+				Sleep(1000);
 			}
 			x++;
-      	}
-      	(nextWorker++)%numWorkers;
-      	x = nextWorker;
+    }
+    nextWorker++;
+    nextWorker = nextWorker%numWorkers;
+    console.log(index + " " + nextWorker);
 	}
 	//for (var id in cluster.workers) {
 	//    cluster.workers[id].kill();
@@ -54,7 +58,7 @@ else
 			while (d.getTime() < endTime)
 			//for (x = 0; x < 10; x ++)
 			{
-			    console.log(d.getTime() + " " + endTime + " " + (d.getTime() < endTime));
+			    //console.log(d.getTime() + " " + endTime + " " + (d.getTime() < endTime));
 				SendI2C(Math.floor(params[0]/16), params[0]%16, params[1]);
 				Sleep(params[4]);
 				SendI2C(Math.floor(params[0]/16), params[0]%16, params[2]);
@@ -70,20 +74,6 @@ function run()
 	if (iterations >= 32) clearInterval(pid);
 	RingBell(Math.floor(iterations/16), iterations%16, 60, 120, 6, 50);
 	iterations++;
-}
-
-function RingBell(chipAddress, regAddress, minDeg, maxDeg, numRings, delay)
-{
-	var x = 0;
-	var d = new Date();
-	var endTime = d.getTime() + duration;
-	while (d.getTime() < endTime);
-	{
-		SendI2C(chipAddress, regAddress, minDeg);
-		Sleep(delay);
-		SendI2C(chipAddress, regAddress, maxDeg);
-		Sleep(delay);
-	}
 }
 
 // SendI2C({0 or 1}, {0-15}, {0-180} degrees)
@@ -113,10 +103,6 @@ function InitializeI2C()
 	s.exec("i2cset -y 2 0x41 0x00 0x01");
 }
 
-onmessage = function(e)
-{
-	workerBusy[e.data] = 0;
-}
 
 function Sleep(milliseconds) {
   var start = new Date().getTime();
