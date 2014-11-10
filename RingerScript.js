@@ -6,6 +6,23 @@ var frequency = 121 // 50 Hz
 var numWorkers = 3;
 var nextWorker = 0;
 
+var f1 = function SendI2C(e)
+{
+	console.log("SendI2C");
+	var params = e.split(" ");
+	var chipAddress = params[0];
+	var regAddress = params[1];
+	var data = params[2];
+	var raw = Math.floor(data * 386 / 180 + 145);
+	var rawH = Math.floor(raw / 256);
+	var rawL = raw % 256;
+	console.log(chipAddress + " " + regAddress + " " + data);
+	s.exec("i2cset -y 2 " + (0x40 + chipAddress) + " " + (6 + 4*regAddress) + " 0x00");
+	s.exec("i2cset -y 2 " + (0x40 + chipAddress) + " " + (7 + 4*regAddress) + " 0x00");
+	s.exec("i2cset -y 2 " + (0x40 + chipAddress) + " " + (8 + 4*regAddress) + " " + rawL);
+	s.exec("i2cset -y 2 " + (0x40 + chipAddress) + " " + (9 + 4*regAddress) + " " + rawH);
+}
+
 InitializeI2C();
 
 var x = 0;
@@ -16,76 +33,70 @@ if (cluster.isMaster)
 		cluster.fork();
 	}
 
-	var repetitions = 16;
+	var repetitions = 4;
 	var index = 0;
-	for (index = 0; index < repetitions; index++)
+	setInterval(function()
 	{
-		
+		index = index%repetitions;
 		x = 0;
 		for (var id in cluster.workers) 
 		{
   	  if (x==nextWorker)
 			{
-				
 				cluster.workers[id].send(index + " 60 120 1000 30");
-				Sleep(1000);
 			}
-			x++;
+			break;
     }
     nextWorker++;
     nextWorker = nextWorker%numWorkers;
-    console.log(index + " " + nextWorker);
-	}
-	//for (var id in cluster.workers) {
-	//    cluster.workers[id].kill();
-	//}
+    index++;
+	}, 500);
 }
 else
 {
-	//chipAddress, regAddress, minDeg, maxDeg, duration, delay, workerNum
-	var iterations = 32;
-	var live = 1;
-//	while (live)
-//	{
+	//chipAddress, regAddress, minDeg, maxDeg, duration, delay
+	//var iterations = 4;
 		process.on('message', function(e)
 		{
 		    
-		    var params = e.split(" ");
-			var x = 0;
-			var d = new Date();
-			var endTime = parseInt(d.getTime()) + parseInt(params[3]);
-			//console.log(e + " " + d.getTime() +" " + params[3] + " " + endTime);
-			while (d.getTime() < endTime)
-			//for (x = 0; x < 10; x ++)
-			{
-			    //console.log(d.getTime() + " " + endTime + " " + (d.getTime() < endTime));
-				SendI2C(Math.floor(params[0]/16), params[0]%16, params[1]);
-				Sleep(params[4]);
-				SendI2C(Math.floor(params[0]/16), params[0]%16, params[2]);
-				Sleep(params[4]);
-				d = new Date();
-			}
+		  var params = e.split(" ");
+			var s1 = setInterval(function()
+				{
+					//var params = e.split(" ");
+					var chipAddress = Math.floor(params[0]/16);
+					var regAddress = params[0]%16;
+					var data = params[1];
+					var raw = Math.floor(data * 386 / 180 + 145);
+					var rawH = Math.floor(raw / 256);
+					var rawL = raw % 256;
+					console.log(chipAddress + " " + regAddress + " " + data);
+					s.exec("i2cset -y 2 " + (0x40 + chipAddress) + " " + (6 + 4*regAddress) + " 0x00");
+					s.exec("i2cset -y 2 " + (0x40 + chipAddress) + " " + (7 + 4*regAddress) + " 0x00");
+					s.exec("i2cset -y 2 " + (0x40 + chipAddress) + " " + (8 + 4*regAddress) + " " + rawL);
+					s.exec("i2cset -y 2 " + (0x40 + chipAddress) + " " + (9 + 4*regAddress) + " " + rawH);
+				}, params[4]);
+			var s2 = setInterval(function()
+				{
+					//var params = e.split(" ");
+					var chipAddress = Math.floor(params[0]/16);
+					var regAddress = params[0]%16;
+					var data = params[2];
+					var raw = Math.floor(data * 386 / 180 + 145);
+					var rawH = Math.floor(raw / 256);
+					var rawL = raw % 256;
+					console.log(chipAddress + " " + regAddress + " " + data);
+					s.exec("i2cset -y 2 " + (0x40 + chipAddress) + " " + (6 + 4*regAddress) + " 0x00");
+					s.exec("i2cset -y 2 " + (0x40 + chipAddress) + " " + (7 + 4*regAddress) + " 0x00");
+					s.exec("i2cset -y 2 " + (0x40 + chipAddress) + " " + (8 + 4*regAddress) + " " + rawL);
+					s.exec("i2cset -y 2 " + (0x40 + chipAddress) + " " + (9 + 4*regAddress) + " " + rawH);
+					flag = true;
+				}, params[4]*2);
+			setTimeout(function() { 
+				clearTimeout(s1);
+				clearTimeout(s2);
+			}, params[3]);
 		});
 //  }
-}
-
-function run()
-{
-	if (iterations >= 32) clearInterval(pid);
-	RingBell(Math.floor(iterations/16), iterations%16, 60, 120, 6, 50);
-	iterations++;
-}
-
-// SendI2C({0 or 1}, {0-15}, {0-180} degrees)
-function SendI2C(chipAddress, regAddress, data)
-{
-	var raw = Math.floor(data * 386 / 180 + 145);
-	var rawH = Math.floor(raw / 256);
-	var rawL = raw % 256;
-	s.exec("i2cset -y 2 " + (0x40 + chipAddress) + " " + (6 + 4*regAddress) + " 0x00");
-	s.exec("i2cset -y 2 " + (0x40 + chipAddress) + " " + (7 + 4*regAddress) + " 0x00");
-	s.exec("i2cset -y 2 " + (0x40 + chipAddress) + " " + (8 + 4*regAddress) + " " + rawL);
-	s.exec("i2cset -y 2 " + (0x40 + chipAddress) + " " + (9 + 4*regAddress) + " " + rawH);
 }
 
 function InitializeI2C()
@@ -104,11 +115,3 @@ function InitializeI2C()
 }
 
 
-function Sleep(milliseconds) {
-  var start = new Date().getTime();
-  for (var i = 0; i < 1e7; i++) {
-    if ((new Date().getTime() - start) > milliseconds){
-      break;
-    }
-  }
-}
