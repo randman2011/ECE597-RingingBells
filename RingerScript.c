@@ -46,6 +46,8 @@ void main(int argc, char *argv[])
 
   timeout = POLL_TIMEOUT;
   
+  InitI2C();
+
   for(i = 0; i < NUM_BELLS; i++){
     pthread_create(&threads[i], NULL, ThreadFunction, &i);
   }
