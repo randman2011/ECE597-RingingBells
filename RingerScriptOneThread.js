@@ -3,7 +3,7 @@ var s = require("child_process");
 var cluster = new require("cluster");
 var frequency = 121 // 50 Hz
 
-var numWorkers = 5;
+var numWorkers = 1;
 var nextWorker = 0;
 
 InitializeI2C();
