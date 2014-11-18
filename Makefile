@@ -1,12 +1,20 @@
 TOOLS_CFLAGS	:= -Wstrict-prototypes -Wshadow -Wpointer-arith -Wcast-qual \
 		   -Wcast-align -Wwrite-strings -Wnested-externs -Winline \
 		   -W -Wundef -Wmissing-prototypes
+
+LDFLAGS		:= -pthread
+
+CFLAGS		:= -lpthread
+
 #
 # Programs
 #
-all:	readanalog
+all:	readanalog RingerScript
 
 readanalog:  readanalog.o gpio-utils.o
+	$(CC) $(LDFLAGS) -o $@ $^
+
+RingerScript:	RingerScript.o gpio-utils.o i2cbusses.o
 	$(CC) $(LDFLAGS) -o $@ $^
 
 #
@@ -17,4 +25,4 @@ readanalog:  readanalog.o gpio-utils.o
 	$(CC) $(CFLAGS) $(TOOLS_CFLAGS) -c $< -o $@
 
 clean:
-	rm *.o readanalog
+	rm *.o readanalog RingerScript
