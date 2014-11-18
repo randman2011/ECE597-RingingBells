@@ -8,6 +8,8 @@
 #include "gpio-utils.h"
 #include <pthread.h>
 #include <signal.h>
+#include <fcntl.h>
+#include <poll.h>
 
 #define NUM_BELLS 6
 #define BELLS_PER 5
@@ -22,6 +24,9 @@ void *ThreadFunction(void *param);
 void SendI2C(int chipAddress, int bellNumber, int deg);
 void InitI2C(void);
 
+#define POLL_TIMEOUT (3*1000)
+#define MAX_BUF 64
+
 //signal handler function (to kill entire program cleanly)
 void signal_handler(int sig){
   printf("Ctrl-C pressed, cleaning up and exiting...\n");
@@ -30,11 +35,32 @@ void signal_handler(int sig){
 
 void main(int argc, char *argv[])
 {
+  struct pollfd fdset[1];
+  int nfds = 1, rc;
+  int timeout;
+  char buf[MAX_BUF];
   int i = 0;
   pthread_t threads[NUM_BELLS];
   
+  signal(SIGINT, signal_handler);
+
+  timeout = POLL_TIMEOUT;
+  
   for(i = 0; i < NUM_BELLS; i++){
     pthread_create(&threads[i], NULL, ThreadFunction, &i);
+  }
+
+  while(keepgoing){
+    memset((void*)fdset,0,sizeof(fdset));
+    fdset[0].fd = STDIN_FILENO;
+    fdset[0].events = POLLIN;
+
+    rc = poll(fdset, nfds, timeout);
+
+    if(fdset[0].revents & POLLPRI){
+      (void)read(fdset[0].fd,buf,1);
+      printf("\npoll() stdin read 0x%2.2X\n", (unsigned int) buf[0]);
+    }
   }
   
   i = 0;
