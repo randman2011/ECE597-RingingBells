@@ -3,7 +3,7 @@ var s = require("child_process");
 var cluster = new require("cluster");
 var frequency = 121 // 50 Hz
 
-var numWorkers = 5;
+var numWorkers = 8;
 var nextWorker = 0;
 
 InitializeI2C();
@@ -27,7 +27,7 @@ if (cluster.isMaster)
 		threads[nextWorker].send(nextWorker + " 75 105 10000 20");
 		nextWorker++;
 		nextWorker = nextWorker%numWorkers;
-    }, 5000);
+    }, 2000);
 }
 else
 {

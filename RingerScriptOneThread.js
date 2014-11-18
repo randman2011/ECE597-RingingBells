@@ -41,12 +41,18 @@ else
 				{
 					//var params = e.split(" ");
 					var chipAddress = Math.floor(params[0]/16);
-					var regAddress = params[0]%16;
+					var regAddress = Math.floor((250-6)/4);
+					//var regAddress = params[0]%16;
 					var data = params[1];
 					var raw = Math.floor(data * 386 / 180 + 145);
 					var rawH = Math.floor(raw / 256);
 					var rawL = raw % 256;
 					console.log(chipAddress + " " + regAddress + " " + data);
+					s.exec("i2cset -y 2 " + (0x40 + chipAddress) + " " + (6 + 4*regAddress) + " 0x00");
+					s.exec("i2cset -y 2 " + (0x40 + chipAddress) + " " + (7 + 4*regAddress) + " 0x00");
+					s.exec("i2cset -y 2 " + (0x40 + chipAddress) + " " + (8 + 4*regAddress) + " " + rawL);
+					s.exec("i2cset -y 2 " + (0x40 + chipAddress) + " " + (9 + 4*regAddress) + " " + rawH);
+					chipAddress = 1;
 					s.exec("i2cset -y 2 " + (0x40 + chipAddress) + " " + (6 + 4*regAddress) + " 0x00");
 					s.exec("i2cset -y 2 " + (0x40 + chipAddress) + " " + (7 + 4*regAddress) + " 0x00");
 					s.exec("i2cset -y 2 " + (0x40 + chipAddress) + " " + (8 + 4*regAddress) + " " + rawL);
@@ -57,12 +63,18 @@ else
 				{
 					//var params = e.split(" ");
 					var chipAddress = Math.floor(params[0]/16);
-					var regAddress = params[0]%16;
+					var regAddress = Math.floor((250-6)/4);
+					//var regAddress = params[0]%16;
 					var data = params[2];
 					var raw = Math.floor(data * 386 / 180 + 145);
 					var rawH = Math.floor(raw / 256);
 					var rawL = raw % 256;
 					console.log(chipAddress + " " + regAddress + " " + data);
+					s.exec("i2cset -y 2 " + (0x40 + chipAddress) + " " + (6 + 4*regAddress) + " 0x00");
+					s.exec("i2cset -y 2 " + (0x40 + chipAddress) + " " + (7 + 4*regAddress) + " 0x00");
+					s.exec("i2cset -y 2 " + (0x40 + chipAddress) + " " + (8 + 4*regAddress) + " " + rawL);
+					s.exec("i2cset -y 2 " + (0x40 + chipAddress) + " " + (9 + 4*regAddress) + " " + rawH);
+					chipAddress = 1;
 					s.exec("i2cset -y 2 " + (0x40 + chipAddress) + " " + (6 + 4*regAddress) + " 0x00");
 					s.exec("i2cset -y 2 " + (0x40 + chipAddress) + " " + (7 + 4*regAddress) + " 0x00");
 					s.exec("i2cset -y 2 " + (0x40 + chipAddress) + " " + (8 + 4*regAddress) + " " + rawL);

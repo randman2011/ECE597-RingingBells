@@ -11,8 +11,8 @@
 #include <fcntl.h>
 #include <poll.h>
 
-#define NUM_BELLS 4
-#define BELLS_PER 2
+#define NUM_BELLS 6
+#define BELLS_PER 4
 #define ANGLE 30      //degrees peak-to-peak
 #define DELAY 15000   //microseconds
 #define SPEED_ADJUST 1  //1 - speed adjusts based on distance from sensor
@@ -126,7 +126,7 @@ void *ThreadFunction(void *param){
       dir = (dir + 1) % 2;
     }
     if(SPEED_ADJUST){
-      usleep(ain_value * 500);
+      usleep(ain_value * 250);
     } else {
       usleep(DELAY);
     }
@@ -139,11 +139,11 @@ void SendI2C(int chipAddress, int bellNumber, int deg){
   int rawH = raw / 256;
   int rawL = raw % 256;
   
-  sprintf(buffer, "i2cset -y 2 %d %d 0", 0x40 + chipAddress, 6 + bellNumber*4);
-  system(buffer);
+  //sprintf(buffer, "i2cset -y 2 %d %d 0", 0x40 + chipAddress, 6 + bellNumber*4);
+  //system(buffer);
   //printf("%s\n", buffer);
-  sprintf(buffer, "i2cset -y 2 %d %d 0", 0x40 + chipAddress, 7 + bellNumber*4);
-  system(buffer);
+  //sprintf(buffer, "i2cset -y 2 %d %d 0", 0x40 + chipAddress, 7 + bellNumber*4);
+  //system(buffer);
   //printf("%s\n", buffer);
   sprintf(buffer, "i2cset -y 2 %d %d %d", 0x40 + chipAddress, 8 + bellNumber*4, rawL);
   system(buffer);
