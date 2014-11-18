@@ -36,7 +36,12 @@ void main(int argc, char *argv[])
   for(i = 0; i < NUM_BELLS; i++){
     pthread_create(&threads[i], NULL, ThreadFunction, &i);
   }
-
+  
+  i = 0;
+  while(i < NUM_BELLS){
+    pthread_join(threads[i], NULL);
+    i++;
+  }
   
   //for (int x = 0; x < numWorkers; x++){
   //  pthread_create(&threads[x], NULL, ThreadFunction, NULL);
