@@ -15,7 +15,7 @@
 #define BELLS_PER 2
 #define ANGLE 30      //degrees peak-to-peak
 #define DELAY 15000   //microseconds
-#define SPEED_ADJUST 0  //1 - speed adjusts based on distance from sensor
+#define SPEED_ADJUST 1  //1 - speed adjusts based on distance from sensor
 
 //int numWorkers = 2;
 //int nextWorker = 0;
@@ -100,7 +100,7 @@ void *ThreadFunction(void *param){
   
   while(keepgoing){  //change this to some signal, sent by main program, to end
     ain_get_value(ain, &ain_value);
-    if(ain_value > 1400){
+    if(ain_value > 1000){
       //don't ring
     } else{
       //ring
@@ -178,5 +178,6 @@ void InitI2C(){
 
 void InitAIN(){
   system("echo cape-bone-iio > /sys/devices/bone_capemgr.9/slots");
+  printf("echo cape-bone-iio > /sys/devices/bone_capemgr.9/slots\n");
 }
 
